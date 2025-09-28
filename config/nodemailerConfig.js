@@ -1,13 +1,12 @@
-import nodemailer from 'nodemailer';  // Importing nodemailer for email sending functionality
-import dotenv from 'dotenv';          // Importing dotenv to load environment variables
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
-dotenv.config();  // Loading environment variables from .env file
+dotenv.config();
 
-// Creating a transporter using nodemailer
 export const transporter = nodemailer.createTransport({
-    service: 'gmail',  // Using Gmail as the email service provider
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL,     // Fetching email address from environment variables
-        pass: process.env.PASSWORD   // Fetching email password from environment variables
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD
     }
 });

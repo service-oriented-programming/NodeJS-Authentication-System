@@ -1,10 +1,10 @@
-import mongoose from "mongoose";  // Importing mongoose for MongoDB interactions
-import User from "../models/userModel.js";  // Importing User model
-import bcrypt from "bcrypt";  // Importing bcrypt for password hashing
-import { transporter } from "../config/nodemailerConfig.js";  // Importing nodemailer transporter
-import dotenv from "dotenv";  // Importing dotenv to load environment variables
+import mongoose from "mongoose";
+import User from "../models/userModel.js";
+import bcrypt from "bcrypt";
+import { transporter } from "../config/nodemailerConfig.js";
+import dotenv from "dotenv";
 
-dotenv.config();  // Loading environment variables from .env file
+dotenv.config();
 
 export  class UserGetController {
     getSignUpPage = (req, res) => {
@@ -42,7 +42,7 @@ export  class UserGetController {
                 console.error('Error signing out:', err);
                 res.status(500).send('Error signing out');
             } else {
-                res.status(201).render('signin',{message:"user logout"}); // Redirect to the sign-in page after signing out
+                res.status(201).render('signin',{message:"user logout"});
             }
         });
     }
@@ -57,7 +57,6 @@ export  class UserPostController {
         if (password !== cpassword) {
             return res.status(400).render("signup",{message:"Passwords don't match"});
         }
-        //check if user already exists
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             return res.status(400).render("signup",{message:"User already exists"});
@@ -72,23 +71,21 @@ export  class UserPostController {
         }
     };
 
-    //sign in
     signInUser = async (req, res) => {
         const { email, password } = req.body;
-        //Recaptcha
         const recaptcha = req.body['g-recaptcha-response'];
 
         if (recaptcha === undefined || recaptcha === '' || recaptcha === null) {
             return res.status(404).render("signin",{message:"Please select captcha"});
         }
-        // const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-        // const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptcha}`;
-        // const response = await fetch(url, {
-        //     method: 'POST',
-        //     headers: {
-        //         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-        //     }
-        // });
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptcha}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+            }
+        });
 
         try {
             const existingUser = await User.findOne({ email: email});
@@ -109,8 +106,6 @@ export  class UserPostController {
             
         }
     }
-
-    //forgot password
     forgotPassword = async (req, res) => {
         const { email } = req.body;
         try {
@@ -118,7 +113,6 @@ export  class UserPostController {
             if (!existingUser) 
                 return res.status(404).render("forgot-password",{message:"User doesn't exist"});
 
-            // Generate random password
             const newPassword = Math.random().toString(36).slice(-8);
             const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -144,7 +138,6 @@ export  class UserPostController {
         }
     }
 
-    //change password
     changePassword = async (req, res) => {
         const { oldPassword, newPassword } = req.body;
         try {
